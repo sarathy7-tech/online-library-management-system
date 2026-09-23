@@ -195,8 +195,8 @@ staff-only pages.
 
 ### Step 1 — Get the code
 ```bash
-git clone <your-repo-url>
-cd librarysystem
+git clone https://github.com/sarathy7-tech/online-library-management-system.git
+cd online-library-management-system
 ```
 *(If you downloaded this as a zip instead, just extract it and `cd` into the `librarysystem` folder.)*
 
