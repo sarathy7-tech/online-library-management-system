@@ -441,6 +441,7 @@ You are free to use, copy, modify, and distribute this project in accordance wit
 ## 👨‍💻 Author
 
 **Sarathy K**
-GitHub: [@sarathy7-tech](https://github.com/sarathy7-tech)
+GitHub:
+[@sarathy7-tech](https://github.com/sarathy7-tech)
 
 ---
