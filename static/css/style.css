@@ -1,0 +1,368 @@
+/* ==================== GLOBAL ==================== */
+
+:root {
+    --primary: #4f46e5;
+    --primary-dark: #4338ca;
+    --success: #10b981;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    --dark: #1e293b;
+    --light: #f8fafc;
+    --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background-color: #f1f5f9;
+    color: #1e293b;
+}
+
+
+/* ==================== NAVBAR ==================== */
+
+.navbar-custom {
+    background: linear-gradient(135deg, #4f46e5, #7c3aed) !important;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.15);
+    padding: 0.8rem 0;
+}
+
+.navbar-custom .navbar-brand {
+    font-weight: 700;
+    font-size: 1.4rem;
+    letter-spacing: 0.5px;
+}
+
+.navbar-custom .btn {
+    border-radius: 8px;
+    font-weight: 500;
+}
+
+
+/* ==================== CARDS ==================== */
+
+.card-custom {
+    border: none;
+    border-radius: 16px;
+    box-shadow: var(--card-shadow);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.card-custom:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+}
+
+.stat-card {
+    border-radius: 16px;
+    border: none;
+    overflow: hidden;
+}
+
+
+/* ==================== BUTTONS ==================== */
+
+.btn-custom {
+    border-radius: 10px;
+    font-weight: 500;
+    padding: 0.55rem 1.2rem;
+    transition: all 0.2s ease;
+}
+
+.btn-primary-custom {
+    background: var(--primary);
+    border: none;
+}
+
+.btn-primary-custom:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+}
+
+
+/* ==================== TABLES ==================== */
+
+.table-custom {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.table-custom thead {
+    background-color: #e2e8f0;
+    font-weight: 600;
+}
+
+.table-custom tbody tr:hover {
+    background-color: #f1f5f9;
+}
+
+
+/* ==================== FORMS ==================== */
+
+.form-control,
+.form-select {
+    border-radius: 10px;
+    padding: 0.65rem 1rem;
+    border: 1px solid #cbd5e1;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+}
+
+
+/* ==================== RESPONSIVE ==================== */
+
+@media (max-width: 768px) {
+    .stat-card h3 {
+        font-size: 1.4rem;
+    }
+}
+
+
+/* ==================== DARK MODE ==================== */
+
+body.dark-mode {
+    background-color: #0f172a;
+    color: #e2e8f0;
+}
+
+body.dark-mode .card,
+body.dark-mode .card-custom,
+body.dark-mode .stat-card {
+    background-color: #1e293b !important;
+    color: #e2e8f0;
+}
+
+body.dark-mode .card-header {
+    background-color: #1e293b !important;
+    color: #e2e8f0 !important;
+    border-bottom: 1px solid #334155;
+}
+
+body.dark-mode .table {
+    color: #e2e8f0;
+}
+
+body.dark-mode .table thead {
+    background-color: #334155 !important;
+    color: #e2e8f0;
+}
+
+body.dark-mode .table-hover tbody tr:hover {
+    background-color: #334155;
+}
+
+body.dark-mode .form-control,
+body.dark-mode .form-select {
+    background-color: #1e293b;
+    border-color: #475569;
+    color: #e2e8f0;
+}
+
+body.dark-mode .form-control:focus,
+body.dark-mode .form-select:focus {
+    background-color: #1e293b;
+    color: #e2e8f0;
+}
+
+body.dark-mode .list-group-item {
+    background-color: #1e293b;
+    color: #e2e8f0;
+    border-color: #334155;
+}
+
+body.dark-mode .text-muted {
+    color: #94a3b8 !important;
+}
+
+body.dark-mode .alert-info {
+    background-color: #1e3a5f;
+    color: #bfdbfe;
+    border-color: #1e40af;
+}
+
+
+/* ==================== ANIMATIONS ==================== */
+
+
+/* Fade in when page loads */
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.6s ease forwards;
+}
+
+
+/* Staggered animation for cards */
+
+.stat-card {
+    animation: fadeIn 0.5s ease forwards;
+}
+
+.stat-card:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.stat-card:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.stat-card:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+.stat-card:nth-child(4) {
+    animation-delay: 0.4s;
+}
+
+
+/* Card hover animation (already partially there) */
+
+.card-custom {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card-custom:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+}
+
+
+/* Button hover animation */
+
+.btn-custom {
+    transition: all 0.25s ease;
+}
+
+.btn-custom:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(79, 70, 229, 0.25);
+}
+
+
+/* Navbar brand animation */
+
+.navbar-brand {
+    transition: transform 0.3s ease;
+}
+
+.navbar-brand:hover {
+    transform: scale(1.05);
+}
+
+
+/* Table row hover */
+
+.table-custom tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+
+/* Soft pulse for important badges */
+
+@keyframes softPulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.badge-pulse {
+    animation: softPulse 2s infinite;
+}
+
+
+/* ==================== TOAST NOTIFICATIONS ==================== */
+
+.custom-toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    min-width: 280px;
+    max-width: 400px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    padding: 14px 18px;
+    z-index: 9999;
+    opacity: 0;
+    transform: translateX(100%);
+    transition: all 0.35s ease;
+}
+
+.custom-toast.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.toast-content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.toast-success {
+    border-left: 5px solid #10b981;
+}
+
+.toast-error {
+    border-left: 5px solid #ef4444;
+}
+
+.toast-warning {
+    border-left: 5px solid #f59e0b;
+}
+
+body.dark-mode .custom-toast {
+    background: #1e293b;
+    color: #e2e8f0;
+}
+
+
+/* Validation error style */
+
+.is-invalid {
+    border-color: #ef4444 !important;
+}
+
+.error-message {
+    font-size: 0.85rem;
+}
+
+
+/* Pagination */
+
+.pagination .page-link {
+    border-radius: 8px !important;
+    margin: 0 3px;
+    color: #4f46e5;
+    border: 1px solid #e2e8f0;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #4f46e5;
+    border-color: #4f46e5;
+    color: white;
+}
+
+.pagination .page-link:hover {
+    background-color: #eef2ff;
+    color: #4338ca;
+}

@@ -1,0 +1,302 @@
+{% load static %}
+{% load book_extras %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ book.title }} - Online Library</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+
+<body>
+    {% csrf_token %}
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="{% url 'dashboard' %}">📚 Online Library</a>
+            <div class="d-flex">
+                <a href="{% url 'books:book_list' %}" class="btn btn-outline-light btn-sm me-2">All Books</a>
+                <a href="{% url 'circulation:my_books' %}" class="btn btn-outline-light btn-sm me-2">My Books</a>
+                <a href="{% url 'dashboard' %}" class="btn btn-outline-light btn-sm me-2">Dashboard</a>
+                <a href="{% url 'logout' %}" class="btn btn-light btn-sm">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    {% if messages %}
+    <div class="container mt-3">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show py-2">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="container mt-4">
+        <div class="row g-4">
+
+            <!-- Book Information -->
+            <div class="col-lg-8">
+                <div class="card card-custom">
+                    <div class="card-body p-4">
+                        <div class="d-flex gap-3">
+                            {% if book.cover_image %}
+                            <img src="{{ book.cover_image.url }}" alt="{{ book.title }} cover" style="width: 110px; height: 150px; object-fit: cover; border-radius: 8px;">
+                            {% endif %}
+                            <div>
+                                <h2 class="mb-1">{{ book.title }}</h2>
+                                <p class="text-muted mb-2">
+                                    by <strong>{{ book.author.author_name|default:"Unknown Author" }}</strong>
+                                </p>
+                                <p class="mb-0">
+                                    <i class="bi bi-star-fill text-warning"></i>
+                                    <strong>{{ book.average_rating }}</strong>/5
+                                    <span class="text-muted">({{ book.reviews.count }} review{{ book.reviews.count|pluralize }})</span>
+                                </p>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <p><strong>Category:</strong> {{ book.category.category_name|default:"General" }}</p>
+                                <p><strong>Language:</strong> {{ book.language|default:"N/A" }}</p>
+                                <p><strong>Publication Year:</strong> {{ book.publication_year|default:"N/A" }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>ISBN:</strong> {{ book.isbn|default:"N/A" }}</p>
+                                <p><strong>Publisher:</strong> {{ book.publisher.publisher_name|default:"N/A" }}</p>
+                                <p>
+                                    <strong>Available Copies:</strong> {% if book.available_copies > 0 %}
+                                    <span class="text-success fw-bold">{{ book.available_copies }}</span> {% else %}
+                                    <span class="text-danger fw-bold">0</span> {% endif %}
+                                </p>
+                            </div>
+                        </div>
+
+                        {% if book.summary %}
+                        <hr>
+                        <h5>Summary</h5>
+                        <p class="text-muted">{{ book.summary }}</p>
+                        {% endif %}
+
+                        {% if digital_resources %}
+                        <hr>
+                        <h5><i class="bi bi-file-earmark-arrow-down"></i> Digital Resources</h5>
+                        {% for resource in digital_resources %}
+                        <a href="{% url 'books:download_digital' resource.id %}" class="btn btn-outline-primary btn-sm btn-custom mb-2 me-2">
+                            <i class="bi bi-download"></i> Download {{ resource.file_type|upper }}
+                            {% if resource.access_level == 'Member' %}<span class="badge bg-secondary ms-1">Members</span>{% endif %}
+                        </a>
+                        {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Reviews -->
+                <div class="card card-custom mt-4">
+                    <div class="card-body p-4">
+                        <h5 class="mb-3"><i class="bi bi-chat-square-text"></i> Reader Reviews</h5>
+
+                        <form method="POST" action="{% url 'books:add_review' book.id %}" class="mb-4 p-3" style="background: rgba(0,0,0,0.03); border-radius: 10px;">
+                            {% csrf_token %}
+                            <label class="form-label fw-semibold mb-1">{% if my_review %}Update your review{% else %}Write a review{% endif %}</label>
+                            <div class="row g-2">
+                                <div class="col-auto">
+                                    <select name="rating" class="form-select form-select-sm">
+                                        {% for i in "12345" %}
+                                        <option value="{{ i }}" {% if my_review.rating|stringformat:"s" == i %}selected{% elif not my_review and i == "5" %}selected{% endif %}>{{ i }} star{{ i|pluralize }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col">
+                                    <input type="text" name="comment" class="form-control form-control-sm" placeholder="Optional comment..." value="{{ my_review.comment|default:'' }}">
+                                </div>
+                                <div class="col-auto">
+                                    <button type="submit" class="btn btn-sm btn-primary btn-custom">{% if my_review %}Update{% else %}Post{% endif %}</button>
+                                </div>
+                            </div>
+                            {% if my_review %}
+                            <div class="mt-2">
+                                <button type="submit" form="deleteReviewForm" class="btn btn-sm btn-link text-danger p-0">Remove my review</button>
+                            </div>
+                            {% endif %}
+                        </form>
+                        {% if my_review %}
+                        <form id="deleteReviewForm" method="POST" action="{% url 'books:delete_review' my_review.id %}" class="d-none">
+                            {% csrf_token %}
+                        </form>
+                        {% endif %}
+
+                        {% if other_reviews %}
+                        {% for review in other_reviews %}
+                        <div class="border-bottom pb-2 mb-2">
+                            <strong>{{ review.user.get_full_name|default:review.user.username }}</strong>
+                            <span class="text-warning">{% for _ in review.rating|star_range %}<i class="bi bi-star-fill"></i>{% endfor %}</span>
+                            <p class="text-muted mb-0 small">{{ review.comment }}</p>
+                        </div>
+                        {% endfor %}
+                        {% elif not my_review %}
+                        <p class="text-muted mb-0">No reviews yet — be the first!</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                {% if related_books %}
+                <div class="card card-custom mt-4">
+                    <div class="card-body p-4">
+                        <h5 class="mb-3"><i class="bi bi-collection"></i> More in {{ book.category.category_name }}</h5>
+                        <div class="row g-3">
+                            {% for rb in related_books %}
+                            <div class="col-6 col-md-3">
+                                <a href="{% url 'books:book_detail' rb.id %}" class="text-decoration-none text-reset">
+                                    <div class="card card-custom h-100">
+                                        <div class="card-body p-2">
+                                            <p class="mb-1 small fw-semibold">{{ rb.title|truncatechars:40 }}</p>
+                                            <p class="mb-0 small text-muted">{{ rb.author.author_name|default:"Unknown" }}</p>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Actions Card -->
+            <div class="col-lg-4">
+                <div class="card card-custom">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="bi bi-lightning-charge"></i> Actions</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if available_copies %}
+                        <div class="alert alert-success py-2">
+                            <i class="bi bi-check-circle"></i> This book is available!
+                        </div>
+                        {% for copy in available_copies %}
+                        <button type="button" class="btn btn-success btn-custom w-100 mb-2 borrow-btn" data-copy-id="{{ copy.id }}" data-book-title="{{ book.title }}">
+                        <i class="bi bi-journal-arrow-up"></i> Borrow this Copy
+                        </button> {% endfor %} {% else %}
+                        <div class="alert alert-danger py-2">
+                            <i class="bi bi-x-circle"></i> No copies available right now.
+                        </div>
+                        <form method="POST" action="{% url 'circulation:reserve_book' book.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-warning btn-custom w-100">
+                                <i class="bi bi-bookmark"></i> Reserve this Book
+                            </button>
+                        </form>
+                        {% endif %}
+
+                        <a href="{% url 'books:book_list' %}" class="btn btn-outline-secondary btn-custom w-100 mt-3">
+                        ← Back to Books
+                    </a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Borrow Confirmation Modal -->
+    <div class="modal fade" id="borrowModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 16px;">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title">Confirm Borrow</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to borrow <strong id="modalBookTitle"></strong>?</p>
+                    <p class="text-muted small mb-0">Due date will be set to 14 days from today.</p>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-outline-secondary btn-custom" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" id="confirmBorrowBtn" class="btn btn-success btn-custom">
+                    Yes, Borrow
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+
+    <script>
+        const borrowModalEl = document.getElementById('borrowModal');
+        const borrowModal = new bootstrap.Modal(borrowModalEl);
+        const modalBookTitle = document.getElementById('modalBookTitle');
+        const confirmBorrowBtn = document.getElementById('confirmBorrowBtn');
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        let selectedCopyId = null;
+
+        // When user clicks Borrow button
+        document.querySelectorAll('.borrow-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                selectedCopyId = this.getAttribute('data-copy-id');
+                const bookTitle = this.getAttribute('data-book-title');
+
+                modalBookTitle.textContent = bookTitle;
+                borrowModal.show();
+            });
+        });
+
+        // When user confirms borrow
+        confirmBorrowBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+
+            if (!selectedCopyId) return;
+
+            confirmBorrowBtn.innerHTML = 'Borrowing...';
+            confirmBorrowBtn.disabled = true;
+
+            fetch(`/circulation/borrow/${selectedCopyId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRFToken': csrfToken
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    borrowModal.hide();
+                    confirmBorrowBtn.innerHTML = 'Yes, Borrow';
+                    confirmBorrowBtn.disabled = false;
+
+                    if (data.success) {
+                        showToast(data.message + ` Due date: ${data.due_date}`, 'success');
+
+                        // Optional: reload after 1.5 seconds so availability updates
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1500);
+                    } else {
+                        showToast(data.message, 'error');
+                    }
+                })
+                .catch(error => {
+                    borrowModal.hide();
+                    confirmBorrowBtn.innerHTML = 'Yes, Borrow';
+                    confirmBorrowBtn.disabled = false;
+                    showToast('Something went wrong. Please try again.', 'error');
+                    console.error(error);
+                });
+        });
+    </script>
+
+</body>
+
+</html>

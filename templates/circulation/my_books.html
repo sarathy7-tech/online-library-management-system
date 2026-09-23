@@ -1,0 +1,97 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Books - Online Library</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="{% url 'dashboard' %}">📚 Online Library</a>
+            <div class="d-flex">
+                <a href="{% url 'books:book_list' %}" class="btn btn-outline-light btn-sm me-2">Browse Books</a>
+                <a href="{% url 'dashboard' %}" class="btn btn-outline-light btn-sm me-2">Dashboard</a>
+                <a href="{% url 'profile' %}" class="btn btn-outline-light btn-sm me-2">Profile</a>
+                <a href="{% url 'logout' %}" class="btn btn-light btn-sm">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+
+        <h3 class="mb-4">My Borrowed Books</h3>
+
+        {% if messages %} {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %} {% endif %} {% if loans %}
+        <div class="card card-custom">
+            <div class="table-responsive">
+                <table class="table table-custom table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Book Title</th>
+                            <th>Borrowed Date</th>
+                            <th>Due Date</th>
+                            <th>Status</th>
+                            <th>Fine</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for loan in loans %}
+                        <tr>
+                            <td>{{ loan.copy.book.title }}</td>
+                            <td>{{ loan.loan_date }}</td>
+                            <td>{{ loan.due_date }}</td>
+                            <td>
+                                {% if loan.status == 'Active' %}
+                                <span class="badge bg-primary">Active</span> {% elif loan.status == 'Returned' %}
+                                <span class="badge bg-success">Returned</span> {% elif loan.status == 'Overdue' %}
+                                <span class="badge bg-danger">Overdue</span> {% else %}
+                                <span class="badge bg-secondary">{{ loan.status }}</span> {% endif %}
+                            </td>
+                            <td>
+                                {% if loan.fine_amount > 0 %}
+                                <span class="text-danger fw-semibold">₹{{ loan.fine_amount }}</span> {% else %} — {% endif %}
+                            </td>
+                            <td>
+                                {% if loan.status == 'Active' or loan.status == 'Overdue' %}
+                                <form method="POST" action="{% url 'circulation:return_book' loan.id %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-outline-danger btn-custom">Return</button>
+                                </form>
+                                <form method="POST" action="{% url 'circulation:renew_book' loan.id %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-outline-primary btn-custom">Renew</button>
+                                </form> {% else %} — {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% else %}
+        <div class="alert alert-info">
+            You have not borrowed any books yet.
+            <a href="{% url 'books:book_list' %}" class="alert-link">Browse books</a>
+        </div>
+        {% endif %}
+
+    </div>
+
+</body>
+
+</html>
